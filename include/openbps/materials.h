@@ -37,18 +37,22 @@ public:
     //! Get name
     //! \return Material name
     std::string Name() {return name_;}
+    void setName(std::string n) {name_ = n;}
 
     //! Get the radiation power
     //! \return power [Wt]
     double Power()     {return power_;}
+    void setPower(double n) {power_ = n;}
 
     //! Get material volume
     //! \return material volume [cm^3]
     double Volume()    {return volume_;}
+    void setVolume(double n) {volume_ = n;}
 
     //! Get material mass
     //! \return material mass [g]
     double Mass()      {return mass_;}
+    void setMass(double n) {mass_ = n;}
 private:
     //--------------------------------------------------------------------------
     // Attributes
@@ -80,6 +84,7 @@ public:
     //! \param[in] extname name of new nuclide
     //! \param[in] exconc concentration of nuclide [atom/b-cm]
     void add_nuclide(const std::string& extname, udouble extconc);
+    void delete_nuclide(const std::string& extname);
 
     //--------------------------------------------------------------------------
     // Attributes

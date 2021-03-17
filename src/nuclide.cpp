@@ -8,6 +8,7 @@
 #include <memory>
 #include "../extern/pugiData/pugixml.h"
 #include "openbps/configure.h"
+#include "openbps/capi.h"
 
 namespace openbps {
 
@@ -219,4 +220,288 @@ int get_nuclidarray_index(const std::string& name) {
 }
 
 } //namespace openbps
+
+//==============================================================================
+// C API
+//==============================================================================
+
+extern "C" int
+openbps_get_nuclidearray_index (const char* name)
+{
+    int err = 0;
+    try {
+        openbps::get_nuclidarray_index({name});
+      
+    } catch (const std::runtime_error& e) {
+        return OPENBPS_E_DATA;
+    }
+  return err;
+}
+
+extern "C" int
+openbps_read_nuclide_xml (const char* filepath)
+{
+    int err = 0;
+    try {
+        openbps::read_nuclide_xml({filepath});
+      
+    } catch (const std::runtime_error& e) {
+        return OPENBPS_E_DATA;
+    }
+  return err;
+}
+
+
+extern "C" int
+openbps_chain_nuclides_add(char* name, int Z, int A, int M, double awr)
+{
+  int err = 0;
+    try {
+        openbps::nuclides.push_back(std::make_unique<openbps::ChainNuclide>(std::string(name), Z, A, M, awr));
+        openbps::nuclides.back()->i_nuclide_ = openbps::nuclides.size() - 1;
+    } catch (const std::runtime_error& e) {
+        return OPENBPS_E_DATA;
+    }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_get_name_by_index (int32_t index, char** name)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      std::strcpy(*name, openbps::nuclides[index]->name_.c_str());
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_set_name_by_index (int32_t index, char* name)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      openbps::nuclides[index]->name_ = {name};
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_get_Z_by_index (int32_t index, int* Z)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      *Z = openbps::nuclides[index]->Z_;
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_set_Z_by_index (int32_t index, int Z)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      openbps::nuclides[index]->Z_ = Z;
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_get_A_by_index (int32_t index, int* A)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      *A = openbps::nuclides[index]->A_;
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_set_A_by_index (int32_t index, int A)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      openbps::nuclides[index]->A_ = A;
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_get_m_by_index (int32_t index, int* m)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      *m = openbps::nuclides[index]->m_;
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_set_m_by_index (int32_t index, int m)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      openbps::nuclides[index]->m_ = m;
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_set_awr_by_index (int32_t index, double awr)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      openbps::nuclides[index]->awr_ = awr;
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_get_awr_by_index (int32_t index, double* awr)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      *awr = openbps::nuclides[index]->awr_;
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_set_hl_by_index (int32_t index, double real, double dev)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      openbps::nuclides[index]->half_life = openbps::udouble(real, dev);
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_get_hl_by_index (int32_t index, double* real, double* dev)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      *dev = openbps::nuclides[index]->half_life.Dev();
+      *real = openbps::nuclides[index]->half_life.Real();
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_set_decay_eng_by_index (int32_t index, double real, double dev)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      openbps::nuclides[index]->decay_energy = openbps::udouble(real, dev);
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_chain_nuclides_get_decay_eng_by_index (int32_t index, double* real, double* dev)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::nuclides.size()) {
+    try {
+      *dev = openbps::nuclides[index]->decay_energy.Dev();
+      *real = openbps::nuclides[index]->decay_energy.Real();
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
 

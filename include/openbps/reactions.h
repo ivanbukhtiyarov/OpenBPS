@@ -82,10 +82,12 @@ public:
     //!
     //! \return Composition name
     std::string Name() {return name_;}
+    void setName(std::string n) {name_ = n;}
     //! Get nuclid number
     //!
     //! \return number of nuclides
     size_t NuclidNumber() {return nuclide_number_;}
+    void setNuclidNumber(size_t n) {nuclide_number_ = n;}
     //! Get a number of energy discretezation interval
     //!
     //! \return number of energy points

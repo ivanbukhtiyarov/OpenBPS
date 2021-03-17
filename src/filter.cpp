@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "../extern/pugiData/pugixml.h"
 #include "openbps/parse.h"
+#include "openbps/capi.h"
 
 
 namespace openbps {
@@ -105,3 +106,199 @@ void read_fitlers_from_xml(pugi::xml_node root_node) {
 }
 
 } //namespace openbps
+
+//==============================================================================
+// C API
+//==============================================================================
+
+//added param input_size for convinience
+extern "C" int
+openbps_filter_apply (int32_t index, const char** input, size_t input_size, int** indices)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::filters.size()) {
+    std::vector<int> tmp_indices; //clean indices in input (if Im not wrong)
+    try {
+      openbps::filters[index].apply({input, input + input_size}, tmp_indices);
+      *indices = tmp_indices.data();
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_material_filter_apply (const char* mat_name, bool* is_valid)
+{
+    int err = 0;
+    try {
+      openbps::materialfilter->apply({mat_name}, *is_valid);
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  return err;
+}
+
+extern "C" int
+openbps_time_filter_apply (double dt, int numstep, int** indices)
+{
+    int err = 0;
+    std::vector<int> tmp_indices; //clean indices in input (if Im not wrong)
+    try {
+      openbps::timefilter->apply(dt, numstep, tmp_indices);
+      *indices = tmp_indices.data();
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  return err;
+}
+
+extern "C" int
+openbps_material_filter_get_bins (char*** out)
+{
+    int err = 0;
+    try {
+      size_t i = 0;  
+      for (const auto& el : openbps::materialfilter->bins_) {
+        std::strcpy((*out)[i], el.c_str());
+        i++;
+      }
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    } 
+  return err;
+}
+
+extern "C" int
+openbps_material_filter_add_bin(char* bin)
+{
+    int err = 0;
+    try {
+      openbps::materialfilter->bins_.push_back({bin});
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    } 
+  return err;
+}
+
+extern "C" int
+openbps_material_filter_delete_bin(char* bin)
+{
+    int err = 0;
+    try {
+      auto it = std::find(openbps::materialfilter->bins_.begin(),
+        openbps::materialfilter->bins_.end(), std::string(bin));
+        if (it != openbps::materialfilter->bins_.end()){ 
+            openbps::materialfilter->bins_.erase(it);
+        }
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    } 
+  return err;
+}
+
+extern "C" int
+openbps_filters_get_bins_by_idx(int32_t index, char*** out)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::filters.size()) {
+    std::vector<int> tmp_indices; //clean indices in input (if Im not wrong)
+    try {
+      size_t i = 0;  
+      for (const auto& el : openbps::filters[index].bins_) {
+        std::strcpy((*out)[i], el.c_str());
+        i++;
+      }
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_filters_add_bin_by_idx (int32_t index, char* bin)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::filters.size()) {
+    std::vector<int> tmp_indices; //clean indices in input (if Im not wrong)
+    try {
+      openbps::filters[index].bins_.push_back({bin});
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_filters_delete_bin_by_idx(int32_t index, char* bin)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::filters.size()) {
+    std::vector<int> tmp_indices; //clean indices in input (if Im not wrong)
+    try {
+        auto it = std::find(openbps::filters[index].bins_.begin(),
+        openbps::filters[index].bins_.end(), std::string(bin));
+        if (it != openbps::materialfilter->bins_.end()){ 
+            openbps::materialfilter->bins_.erase(it);
+        }
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_time_filter_get_bins (double** out)
+{
+    int err = 0;
+    try {
+        *out = openbps::timefilter->bins_.data();
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    } 
+  return err;
+}
+
+extern "C" int
+openbps_time_filter_add_bin (double bin)
+{
+    int err = 0;
+    try {
+      openbps::timefilter->bins_.push_back(bin);
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    } 
+  return err;
+}
+
+extern "C" int
+openbps_time_filter_delete_bin(double bin)
+{
+    int err = 0;
+    try {
+      auto it = std::find(openbps::timefilter->bins_.begin(),
+        openbps::timefilter->bins_.end(), bin);
+        if (it != openbps::timefilter->bins_.end()){ 
+            openbps::timefilter->bins_.erase(it);
+        }
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    } 
+  return err;
+}

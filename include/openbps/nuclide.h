@@ -123,6 +123,22 @@ public:
   //! \return map with target nuclide name and its fraction
   std::map<std::string, double> get_product_data(int index);
 
+  void set_decay_modes(size_t dm) {decay_modes = dm;}
+  void set_reactions(size_t r) {reactions = r;}
+  size_t get_decay_modes() {return decay_modes;}
+  size_t get_reactions_n() {return reactions;}
+  void add_decay(std::string type_, std::string target_,
+    double branching_ratio_real, double q_real,
+    double branching_ratio_dev, double q_dev) {
+      udouble br(branching_ratio_real, branching_ratio_dev), q(q_real, q_dev);
+      decay_arr.push_back({type_, target_, br, q});
+      }
+  void get_decay(std::string& type_, std::string& target_,
+    double* branching_ratio_real, double* q_real,
+    double* branching_ratio_dev, double* q_dev);
+  
+  
+
   //! Get a fission yields for group energy discretization
   //!
   //! \return map with \keyword a target nuclide name and \value yields by

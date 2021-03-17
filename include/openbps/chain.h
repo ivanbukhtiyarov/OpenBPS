@@ -14,6 +14,9 @@
 
 namespace openbps {
 
+    class Chain;
+    extern std::unique_ptr<Chain> chain;
+  
 //==============================================================================
 // Class to handle with nuclide chain structure
 //==============================================================================
@@ -62,6 +65,9 @@ public:
     //! \param[in] name of nuclide
     //! \return index in chain order
     int get_nuclide_index(const std::string& name);
+
+    void set_nuclide_name_idx(const std::string& name, size_t idx);
+    void delete_nuclide_name_idx(const std::string& name);
     //--------------------------------------------------------------------------
     //! Attributes
     std::map<std::string, size_t> name_idx; //!< Dictionary between \keyword

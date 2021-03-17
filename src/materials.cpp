@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "../extern/pugiData/pugixml.h"
 #include "openbps/reactions.h"
+#include "openbps/capi.h"
 
 namespace openbps {
 
@@ -46,6 +47,17 @@ void Materials::add_nuclide(const std::string& extname, udouble extconc) {
     } else {
         auto index = std::distance(this->namenuclides.begin(), it);
         this->conc[index] = extconc;
+    }
+}
+
+void Materials::delete_nuclide(const std::string& extname) {
+    auto it = std::find(this->namenuclides.begin(),
+                        this->namenuclides.end(), extname);
+    if (it != this->namenuclides.end()) {
+        auto index = std::distance(this->namenuclides.begin(), it);
+        this->namenuclides.erase(it);
+        this->conc.erase(conc.begin() + index);
+        this->indexnuclides.erase(indexnuclides.begin() + index);
     }
 }
 
@@ -127,3 +139,123 @@ void matchcompositions() {
 }
 
 } //namespace openbps
+
+//==============================================================================
+// C API
+//==============================================================================
+
+extern "C" int
+openbps_material_add_nuclide(int32_t index, const char* extname, double real, double dev)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::materials.size()) {
+    try {
+      openbps::materials[index]->add_nuclide(extname, {real, dev});
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in materials array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_material_delete_nuclide(int32_t index, const char* extname)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::materials.size()) {
+    try {
+      openbps::materials[index]->delete_nuclide(extname);
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in materials array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_material_matchcompositions()
+{
+    try {
+        openbps::matchcompositions();
+    } catch (const std::runtime_error& e) {
+        return OPENBPS_E_DATA;
+    }
+    return 0;
+}
+
+extern "C" int
+openbps_read_materials_from_inp(char* inp_path)
+{
+    try {
+        openbps::read_materials_from_inp({inp_path});
+    } catch (const std::runtime_error& e) {
+        return OPENBPS_E_DATA;
+    }
+    return 0;
+}
+
+extern "C" int
+openbps_form_materials_xml(char* inp_path)
+{
+    try {
+        openbps::form_materials_xml({inp_path});
+    } catch (const std::runtime_error& e) {
+        return OPENBPS_E_DATA;
+    }
+    return 0;
+}
+
+extern "C" int
+openbps_material_add(char* name, double volume, double power, double mass)
+{
+    int err = 0;
+    try {
+      openbps::materials.push_back(std::make_unique<openbps::Materials>(std::string(name), volume, power, mass));
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+    return err;
+}
+
+extern "C" int
+openbps_material_set_params_by_idx(int32_t index, char* name, double volume, double power, double mass)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::materials.size()) {
+    try {
+      openbps::materials[index]->setMass(mass);
+      openbps::materials[index]->setName({name});
+      openbps::materials[index]->setVolume(volume);
+      openbps::materials[index]->setPower(power);
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in materials array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_material_delete_by_idx(int32_t index)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::materials.size()) {
+    try {
+      openbps::materials.erase(openbps::materials.begin() + index);
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in materials array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}

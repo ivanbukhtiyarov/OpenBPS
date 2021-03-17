@@ -7,9 +7,11 @@
 #include <tuple>
 #include <list>
 #include <algorithm>
+#include "openbps/capi.h"
 
 namespace openbps {
 
+std::unique_ptr<Chain> chain;
 //==============================================================================
 // Chain implementation
 //==============================================================================
@@ -234,9 +236,55 @@ Chain read_chain_xml(const std::string& filename) {
     Chain chainer(chain_node);
     
     return chainer;
+}   
+
+void Chain::set_nuclide_name_idx(const std::string& name, size_t idx) {
+    this->name_idx[name] = idx;
 }
 
-} // namespace openbps
+void Chain::delete_nuclide_name_idx(const std::string& name) {
+    this->name_idx.erase({name});
+} 
 
+}// namespace openbps
 
+//==============================================================================
+// C API
+//==============================================================================
+
+extern "C" int
+openbps_set_nuclide_name_idx (const char* name, size_t idx)
+{
+  int err = 0;
+    try {
+        openbps::chain->set_nuclide_name_idx({name}, idx);
+    } catch (const std::runtime_error& e) {
+        return OPENBPS_E_DATA;
+    }
+    return err;
+}
+
+extern "C" int
+openbps_get_nuclide_index (const char* name, size_t* idx)
+{
+  int err = 0;
+    try {
+        *idx = openbps::chain->get_nuclide_index({name});
+    } catch (const std::runtime_error& e) {
+        return OPENBPS_E_DATA;
+    }
+    return err;
+}
+
+extern "C" int
+openbps_delete_nuclide_by_name (const char* name)
+{
+  int err = 0;
+    try {
+        openbps::chain->delete_nuclide_name_idx({name});
+    } catch (const std::runtime_error& e) {
+        return OPENBPS_E_DATA;
+    }
+    return err;
+}
 

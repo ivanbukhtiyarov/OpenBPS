@@ -144,16 +144,16 @@ void run_solver() {
     if (configure::verbose)
         std::cout << "We start execution\n";
     // Read a chain from xml file
-    Chain chain = read_chain_xml(configure::chain_file);
+    *chain = read_chain_xml(configure::chain_file);
     // Form a calculation matrix
-    DecayMatrix dm(chain.name_idx.size());
-    dm.form_matrixreal(chain);
-    DecayMatrix ddm(chain.name_idx.size());
-    ddm.form_matrixdev(chain);
+    DecayMatrix dm(chain->name_idx.size());
+    dm.form_matrixreal(*chain);
+    DecayMatrix ddm(chain->name_idx.size());
+    ddm.form_matrixdev(*chain);
     xt::xarray<double> dy;
     for (auto& mat : materials) {
         xt::xarray<double> y =
-                make_concentration(chain, mat->namenuclides, mat->conc);
+                make_concentration(*chain, mat->namenuclides, mat->conc);
         // Prepare dump to store every step of calculation results
         if (configure::outwrite) {
             configure::dumpoutput.clear();
@@ -171,15 +171,15 @@ void run_solver() {
         case Mode::iteration:
         {
             IterMatrix im(dm);
-            auto matrix = im.matrixreal(chain, *mat);
-            auto sigp = im.sigp(chain, *mat);
+            auto matrix = im.matrixreal(*chain, *mat);
+            auto sigp = im.sigp(*chain, *mat);
             // Perform calculation with uncertanties analysis
             if (configure::uncertantie_mod) {
-                dy = make_concentration(chain, mat->namenuclides,
+                dy = make_concentration(*chain, mat->namenuclides,
                                         mat->conc, true);
                 IterMatrix imim(ddm);
-                auto dmatrix = imim.matrixdev(chain, *mat);
-                auto dsigp = imim.dsigp(chain, *mat);
+                auto dmatrix = imim.matrixdev(*chain, *mat);
+                auto dsigp = imim.dsigp(*chain, *mat);
                 iterative(matrix, sigp, y,
                           dmatrix, dsigp, dy);
             } else {
@@ -191,7 +191,7 @@ void run_solver() {
         case Mode::chebyshev:
         {
             CramMatrix cm(dm);
-            auto matrix = cm.matrixreal(chain, *mat);
+            auto matrix = cm.matrixreal(*chain, *mat);
             if (configure::order == 8) {
                 cram(matrix, y, alpha16, theta16,
                      configure::order, alpha160);
@@ -203,7 +203,7 @@ void run_solver() {
             break;
         }//switch case
         size_t j {0};
-        for (auto& item : chain.name_idx) {
+        for (auto& item : chain->name_idx) {
             if (configure::verbose)
                 std::cout << item.first << " = " << y[j] << " err: "<<
                              dy[j]<< std::endl;
@@ -226,7 +226,7 @@ void run_solver() {
                 isMaterial = true;
             }
             if (isMaterial)
-                apply_filters(chain, mat->Name());
+                apply_filters(*chain, mat->Name());
          }
     }//for materials
     // Write down the getting nuclear concentration for every material

@@ -9,6 +9,7 @@
 #include "openbps/functionals.h"
 #include "openbps/parse.h"
 #include "../extern/pugiData/pugixml.h"
+#include "openbps/capi.h"
 
 namespace openbps {
 
@@ -312,3 +313,103 @@ void read_importedlib_xml() {
 }
 
 } //namespace openbps
+
+//==============================================================================
+// C API
+//==============================================================================
+
+extern "C" int
+openbps_composition_get_reaction (int32_t index)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::compositions.size()) {
+    try {
+      openbps::compositions[index]->get_reaction();
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_composition_get_fluxenergy (int32_t index, double** first, double** second)
+{
+  int err = 0;
+  if (index >= 0 && index < openbps::compositions.size()) {
+    try {
+      auto res = openbps::compositions[index]->get_fluxenergy();
+      *first = res.first.data();
+      *second = res.second.data();
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_composition_deploy_all (int32_t compos_idx, int32_t extern_compos_idx)
+{
+  int err = 0;
+  if (compos_idx >= 0 && compos_idx < openbps::compositions.size() &&
+        extern_compos_idx >= 0 && extern_compos_idx < openbps::compositions.size()) {
+    try {
+      openbps::compositions[compos_idx]->deploy_all(*openbps::compositions[extern_compos_idx]);
+
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
+
+extern "C" int
+openbps_material_read_importedlib_xml()
+{
+    try {
+        openbps::read_importedlib_xml();
+    } catch (const std::runtime_error& e) {
+        return OPENBPS_E_DATA;
+    }
+  return 0;
+}
+
+extern "C" int
+openbps_material_read_reactions_xml()
+{
+    try {
+        openbps::read_reactions_xml();
+    } catch (const std::runtime_error& e) {
+        return OPENBPS_E_DATA;
+    }
+  return 0;
+}
+
+extern "C" int
+openbps_composition_import_xsdata (int32_t compos_idx, int32_t implibs_idx)
+{
+  int err = 0;
+  if (compos_idx >= 0 && compos_idx < openbps::compositions.size() &&
+        implibs_idx >= 0 && implibs_idx < openbps::externxslibs.size()) {
+    try {
+      openbps::compositions[compos_idx]->import_xsdata(openbps::externxslibs[implibs_idx]);
+
+    } catch (const std::runtime_error& e) {
+      return OPENBPS_E_DATA;
+    }
+  } else {
+//    set_errmsg("Index in composition array is out of bounds.");
+    return OPENBPS_E_OUT_OF_BOUNDS;
+  }
+  return err;
+}
