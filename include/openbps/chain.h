@@ -81,7 +81,7 @@ public:
 //! Get a chain from xml file
 //!
 //! \param[in] filepath xml file containing chain
-Chain read_chain_xml(const std::string& filename);
+void read_chain_xml(const std::string& filename);
 /*xt::xarray<double> form_matrix(Chain& chainer, Materials& mat);
     xt::xarray<double> form_sigp(Chain& chainer, Materials& mat);
     xt::xarray<double> form_dmatrix(Chain& chainer, Materials& mat);

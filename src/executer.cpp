@@ -144,7 +144,7 @@ void run_solver() {
     if (configure::verbose)
         std::cout << "We start execution\n";
     // Read a chain from xml file
-    *chain = read_chain_xml(configure::chain_file);
+    read_chain_xml(configure::chain_file);
     // Form a calculation matrix
     DecayMatrix dm(chain->name_idx.size());
     dm.form_matrixreal(*chain);
