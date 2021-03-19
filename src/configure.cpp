@@ -11,6 +11,18 @@
 #include "openbps/nuclide.h"
 #include "openbps/materials.h"
 
+int OPENBPS_E_UNASSIGNED {-1};
+int OPENBPS_E_ALLOCATE {-2};
+int OPENBPS_E_OUT_OF_BOUNDS {-3};
+int OPENBPS_E_INVALID_SIZE {-4};
+int OPENBPS_E_INVALID_ARGUMENT {-5};
+int OPENBPS_E_INVALID_TYPE {-6};
+int OPENBPS_E_INVALID_ID {-7};
+int OPENBPS_E_GEOMETRY {-8};
+int OPENBPS_E_DATA {-9};
+int OPENBPS_E_PHYSICS {-10};
+int OPENBPS_E_WARNING {1};
+
 namespace openbps {
 
 //==============================================================================
