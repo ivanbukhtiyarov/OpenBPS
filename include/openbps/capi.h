@@ -35,10 +35,12 @@ int openbps_material_delete_by_idx(int32_t index);
 int openbps_materials_get_size(size_t *s);
 int openbps_material_get_params_by_idx(int32_t index, char **name, double *mass,
                                        double *volume, double *power);
-int openbps_material_get_idx_nuclides_by_idx(int32_t index, int** index_nuclides);
-int openbps_material_get_conc_by_idx(int32_t index, double** real, double** dev);
-int openbps_material_get_idx_nuclides_by_idx(int32_t index, int** index_nuclides);
-
+int openbps_material_get_idx_nuclides_by_idx(int32_t index,
+                                             int **index_nuclides);
+int openbps_material_get_conc_by_idx(int32_t index, double **real,
+                                     double **dev);
+int openbps_material_get_idx_nuclides_by_idx(int32_t index,
+                                             int **index_nuclides);
 
 // reactions
 int openbps_composition_get_reaction(int32_t index);
@@ -51,6 +53,39 @@ int openbps_material_read_reactions_xml();
 int openbps_composition_deploy_all(int32_t compos_idx,
                                    int32_t extern_compos_idx);
 int openbps_composition_import_xsdata(int32_t compos_idx, int32_t implibps_idx);
+
+// modify sxs vector in compositions
+int openbps_get_xslibs_size_by_index(int32_t index, size_t *size);
+int openbps_add_xslib_elem(int32_t index, char *name, char *type,
+                           double *real_rxs, double *dev_rxs, size_t rxs_size,
+                           double *real_xs, double *dev_xs, size_t xs_size);
+int openbps_get_xslib_elem_by_index(int32_t index, size_t xlib_idx, char **name,
+                                    char **type, double **real_rxs,
+                                    double **dev_rxs, double **real_xs,
+                                    double **dev_xs);
+int openbps_delete_xslib_elem(int32_t index, size_t xlib_idx);
+
+//compositions
+int openbps_get_composition_data(int32_t index, char **name, size_t *nuclide_n,
+                                 size_t *energy_n);
+int openbps_add_composition(char *name, size_t nuclide_n, size_t energy_n);
+int openbps_delete_composition_by_idx(int32_t index);
+int openbps_composition_get_energy_by_key(int32_t index, size_t key,
+                                          double **res);
+int openbps_composition_set_energy(int32_t index, size_t key, double *en,
+                                   size_t en_size);
+int openbps_composition_delete_energy(int32_t index, size_t key, double *en,
+                                      size_t en_size);
+int openbps_composition_get_all_keys_energy(int32_t index, size_t **res);
+
+//flux&spectrum
+
+int openbps_composition_get_spectrum(int32_t index, double** s_real, double** s_dev);
+int openbps_composition_get_flux(int32_t index, double** f_real, double** f_dev);
+int openbps_composition_add_to_spectrum(int32_t index, double s_real, double s_dev);
+int openbps_composition_add_to_flux(int32_t index, double f_real, double f_dev);
+int openbps_composition_delete_from_spectrum(int32_t index, size_t pos);
+int openbps_composition_delete_from_flux(int32_t index, size_t pos);
 
 // filter
 int openbps_filter_apply(int32_t index, const char **input, size_t input_size,
