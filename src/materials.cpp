@@ -284,6 +284,9 @@ extern "C" int openbps_material_get_nuclides_by_idx(int32_t index, char*** nucli
         try {
             size_t i = 0;
             for (auto& el : openbps::materials[index]->namenuclides) {
+                /*!!!!CRITICAL BUG А кто гарантирует, что память у *nuclides выделена, если *nuclides это
+                указатель просто, а не массив!!!!!!
+                То же самое в остальных get функциях*/
                 *nuclides[i] = el.data();
                 i++;
             }
